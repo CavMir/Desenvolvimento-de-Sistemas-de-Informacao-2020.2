@@ -91,6 +91,9 @@ class _RandomWordsState extends State<RandomWords> {
       onDismissed: (direction) {
         setState(() {
           _suggestions.removeAt(index);
+          if (alreadySaved) {
+            _saved.remove(pair);
+          }
         });
 
         ScaffoldMessenger.of(context)
