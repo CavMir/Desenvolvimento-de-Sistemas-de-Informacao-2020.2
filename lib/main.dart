@@ -86,11 +86,15 @@ class _RandomWordsState extends State<RandomWords> {
 
   Widget _buildRow(WordPair pair, index) {
     final alreadySaved = _saved.contains(pair);
+
     return Dismissible(
       key: Key(pair.hashCode.toString()),
       onDismissed: (direction) {
         setState(() {
           _suggestions.removeAt(index);
+          if (alreadySaved) {
+            _saved.remove(pair);
+          }
         });
 
         ScaffoldMessenger.of(context)
@@ -102,20 +106,23 @@ class _RandomWordsState extends State<RandomWords> {
           pair.asPascalCase,
           style: _biggerFont,
         ),
-        trailing: Icon(
-          alreadySaved ? Icons.favorite : Icons.favorite_border,
+        trailing: IconButton(
+          icon: Icon(alreadySaved ? Icons.favorite : Icons.favorite_border),
           color: alreadySaved ? Colors.red : null,
-        ),
-        onTap: () {
-          setState(() {
-            if (alreadySaved) {
-              _saved.remove(pair);
-            } else {
-              _saved.add(pair);
+            onPressed: () {
+              setState(() {
+                if (alreadySaved) {
+                  _saved.remove(pair);
+                } else {
+                  _saved.add(pair);
+                }
+              });
             }
-          });
-        },
+        ),
 
+        onTap: () {
+          
+        },
       )
     );
   }
