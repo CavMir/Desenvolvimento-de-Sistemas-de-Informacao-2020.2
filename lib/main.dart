@@ -27,14 +27,26 @@ class _RandomWordsState extends State<RandomWords> {
   final _suggestions = <WordPair>[];
   final _saved = <WordPair>{};
   final _biggerFont = const TextStyle(fontSize: 18);
+  final myController = TextEditingController();
+  @override
+  void dispose() {
+    myController.dispose();
+    super.dispose();
+  }
   void _pushSaved() {
     Navigator.of(context).push(MaterialPageRoute<void>(
       builder: (BuildContext context) {
         final tiles = _saved.map(
               (WordPair pair) {
+            String startupName;
+            if (pair.second == ' ') {
+              startupName = pair.asString;
+            } else {
+              startupName = pair.asPascalCase;
+            }
             return ListTile(
               title: Text(
-                pair.asPascalCase,
+                startupName,
                 style: _biggerFont,
               ),
             );
@@ -86,44 +98,84 @@ class _RandomWordsState extends State<RandomWords> {
 
   Widget _buildRow(WordPair pair, index) {
     final alreadySaved = _saved.contains(pair);
+    var startupName;
+    if (pair.second == ' ') {
+      startupName = pair.asString;
+    } else {
+      startupName = pair.asPascalCase;
+    }
 
     return Dismissible(
-      key: Key(pair.hashCode.toString()),
-      onDismissed: (direction) {
-        setState(() {
-          _suggestions.removeAt(index);
-          if (alreadySaved) {
-            _saved.remove(pair);
-          }
-        });
-
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('$pair dismissed')));
-      },
-      background: Container(color: Colors.red),
-      child: ListTile(
-        title: Text(
-          pair.asPascalCase,
-          style: _biggerFont,
-        ),
-        trailing: IconButton(
-          icon: Icon(alreadySaved ? Icons.favorite : Icons.favorite_border),
-          color: alreadySaved ? Colors.red : null,
-            onPressed: () {
-              setState(() {
-                if (alreadySaved) {
-                  _saved.remove(pair);
-                } else {
-                  _saved.add(pair);
-                }
-              });
+        key: Key(pair.hashCode.toString()),
+        onDismissed: (direction) {
+          setState(() {
+            _suggestions.removeAt(index);
+            if (alreadySaved) {
+              _saved.remove(pair);
             }
-        ),
+          });
 
-        onTap: () {
-          
+          ScaffoldMessenger.of(context)
+              .showSnackBar(SnackBar(content: Text('$pair dismissed')));
         },
-      )
+        background: Container(color: Colors.red),
+        child: ListTile(
+          title: Text(
+            startupName,
+            style: _biggerFont,
+          ),
+          trailing: IconButton(
+              icon: Icon(alreadySaved ? Icons.favorite : Icons.favorite_border),
+              color: alreadySaved ? Colors.red : null,
+              onPressed: () {
+                setState(() {
+                  if (alreadySaved) {
+                    _saved.remove(pair);
+                  } else {
+                    _saved.add(pair);
+                  }
+                });
+              }
+          ),
+
+          onTap: () {
+            myController.clear();
+            Navigator.of(context).push(MaterialPageRoute<void>(
+              builder: (BuildContext context) {
+                return Scaffold(
+                  appBar: AppBar(
+                    title: const Text('Edit Startup Name'),
+                  ),
+                  body: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: TextFormField(
+                      decoration: const InputDecoration(
+                        border: UnderlineInputBorder(),
+                        hintText: 'Enter new Startup Name',
+                      ),
+                      controller: myController,
+                    ),
+                  ),
+                  floatingActionButton: FloatingActionButton(
+                    onPressed: () {
+                      setState(() {
+                        if (alreadySaved) {
+                          _saved.remove(_suggestions[index]);
+                        }
+                        _suggestions[index] = WordPair(myController.text, ' ');
+                        _saved.add(_suggestions[index]);
+                      });
+                      Navigator.pop(context);
+                    },
+                    tooltip: 'Save',
+                    child: const Icon(Icons.check),
+                  ),
+                );
+              },
+            ),
+            );
+          },
+        )
     );
   }
 }
