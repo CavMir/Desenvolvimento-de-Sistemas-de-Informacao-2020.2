@@ -18,7 +18,6 @@ class MyApp extends StatelessWidget {
 
 class RandomWords extends StatefulWidget {
   const RandomWords({Key? key}) : super(key: key);
-
   @override
   _RandomWordsState createState() => _RandomWordsState();
 }
@@ -55,7 +54,6 @@ class _RandomWordsState extends State<RandomWords> {
         final divided = tiles.isNotEmpty
             ? ListTile.divideTiles(context: context, tiles: tiles).toList()
             : <Widget>[];
-
         return Scaffold(
           appBar: AppBar(
             title: Text('Saved Suggestions'),
@@ -86,7 +84,6 @@ class _RandomWordsState extends State<RandomWords> {
           if (i.isOdd) {
             return Divider();
           }
-
           final int index = i ~/ 2;
           if (index >= _suggestions.length) {
             _suggestions.addAll(generateWordPairs().take(10));
@@ -104,7 +101,6 @@ class _RandomWordsState extends State<RandomWords> {
     } else {
       startupName = pair.asPascalCase;
     }
-
     return Dismissible(
         key: Key(pair.hashCode.toString()),
         onDismissed: (direction) {
@@ -114,7 +110,6 @@ class _RandomWordsState extends State<RandomWords> {
               _saved.remove(pair);
             }
           });
-
           ScaffoldMessenger.of(context)
               .showSnackBar(SnackBar(content: Text('$pair dismissed')));
         },
@@ -137,7 +132,6 @@ class _RandomWordsState extends State<RandomWords> {
                 });
               }
           ),
-
           onTap: () {
             myController.clear();
             Navigator.of(context).push(MaterialPageRoute<void>(
